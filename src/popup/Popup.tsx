@@ -9,7 +9,7 @@ const Popup: React.FC = () => {
   const [settings, setSettings] = useState<StorageSettings>({});
   const [showConfig, setShowConfig] = useState<boolean>(false);
   const [tempApiKey, setTempApiKey] = useState<string>('');
-  const [tempDatabaseId, setTempDatabaseId] = useState<string>('');
+  const [tempPageId, setTempPageId] = useState<string>('');
   const [bookmarkTitle, setBookmarkTitle] = useState<string>('');
   const [bookmarkNotes, setBookmarkNotes] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
@@ -26,10 +26,10 @@ const Popup: React.FC = () => {
         
         setSettings(savedSettings);
         setTempApiKey(savedSettings.notionApiKey || '');
-        setTempDatabaseId(savedSettings.notionDatabaseId || '');
+        setTempPageId(savedSettings.notionPageId || '');
         
         // Show config if settings are missing
-        if (!savedSettings.notionApiKey || !savedSettings.notionDatabaseId) {
+        if (!savedSettings.notionApiKey || !savedSettings.notionPageId) {
           setShowConfig(true);
         }
       } catch (error) {
@@ -76,21 +76,21 @@ const Popup: React.FC = () => {
   };
 
   const handleSaveConfig = async () => {
-    if (!tempApiKey.trim() || !tempDatabaseId.trim()) {
-      showMessage('error', 'Please fill in both API key and Database ID');
+    if (!tempApiKey.trim() || !tempPageId.trim()) {
+      showMessage('error', 'Please fill in both API key and Page ID');
       return;
     }
 
     try {
       const newSettings: StorageSettings = {
         notionApiKey: tempApiKey.trim(),
-        notionDatabaseId: tempDatabaseId.trim()
+        notionPageId: tempPageId.trim()
       };
 
       // Test the connection before saving
       const notionService = new NotionService({
         apiKey: newSettings.notionApiKey!,
-        databaseId: newSettings.notionDatabaseId!
+        pageId: newSettings.notionPageId!
       });
 
       setSaving(true);
@@ -113,7 +113,7 @@ const Popup: React.FC = () => {
   };
 
   const handleSaveBookmark = async () => {
-    if (!settings.notionApiKey || !settings.notionDatabaseId) {
+    if (!settings.notionApiKey || !settings.notionPageId) {
       showMessage('error', 'Please configure Notion settings first');
       setShowConfig(true);
       return;
@@ -129,7 +129,7 @@ const Popup: React.FC = () => {
       
       const notionService = new NotionService({
         apiKey: settings.notionApiKey,
-        databaseId: settings.notionDatabaseId
+        pageId: settings.notionPageId
       });
 
       const bookmarkData: BookmarkData = {
@@ -153,7 +153,7 @@ const Popup: React.FC = () => {
     }
   };
 
-  const isConfigured = settings.notionApiKey && settings.notionDatabaseId;
+  const isConfigured = settings.notionApiKey && settings.notionPageId;
 
   return (
     <div className="popup-container">
@@ -185,13 +185,13 @@ const Popup: React.FC = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="databaseId">Database ID:</label>
+                  <label htmlFor="pageId">Page ID:</label>
                   <input
-                    id="databaseId"
+                    id="pageId"
                     type="text"
-                    value={tempDatabaseId}
-                    onChange={(e) => setTempDatabaseId(e.target.value)}
-                    placeholder="32-character database ID"
+                    value={tempPageId}
+                    onChange={(e) => setTempPageId(e.target.value)}
+                    placeholder="32-character page ID"
                     className="form-input"
                   />
                 </div>
