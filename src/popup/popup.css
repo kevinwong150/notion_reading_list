@@ -1,7 +1,9 @@
 .popup-container {
   padding: 0;
   margin: 0;
-  min-height: 180px;
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .popup-title {
@@ -57,4 +59,150 @@
   border: 1px solid #e2e8f0;
   margin: 0;
   line-height: 1.4;
+}
+
+/* Message styles */
+.message {
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.message.success {
+  background-color: #c6f6d5;
+  color: #1a365d;
+  border: 1px solid #9ae6b4;
+}
+
+.message.error {
+  background-color: #fed7d7;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+}
+
+/* Configuration section */
+.config-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #2d3748;
+}
+
+/* Form styles */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: #4a5568;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #2d3748;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Button styles */
+.btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: inherit;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background-color: #4299e1;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #3182ce;
+}
+
+.btn-secondary {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #cbd5e0;
+}
+
+.btn-link {
+  background: none;
+  color: #4299e1;
+  text-decoration: none;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.btn-link:hover:not(:disabled) {
+  color: #3182ce;
+  text-decoration: underline;
+}
+
+.btn-save {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Button groups */
+.button-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.button-group .btn {
+  flex: 1;
+}
+
+/* Bookmark section */
+.bookmark-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+/* Settings link */
+.settings-link {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
 }
