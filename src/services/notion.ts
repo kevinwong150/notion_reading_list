@@ -1,7 +1,7 @@
 // Notion API service for managing bookmarks
 export interface NotionConfig {
   apiKey: string;
-  databaseId: string;
+  pageId: string;
 }
 
 export interface BookmarkData {
@@ -18,49 +18,52 @@ export interface NotionResponse {
 
 export class NotionService {
   private apiKey: string;
-  private databaseId: string;
+  private pageId: string;
 
   constructor(config: NotionConfig) {
     this.apiKey = config.apiKey;
-    this.databaseId = config.databaseId;
+    this.pageId = config.pageId;
   }
 
   async saveBookmark(bookmark: BookmarkData): Promise<NotionResponse> {
     try {
-      const response = await fetch('https://api.notion.com/v1/pages', {
-        method: 'POST',
+      // Create a bookmark block to append to the page
+      const bookmarkBlock = {
+        type: 'bookmark',
+        bookmark: {
+          url: bookmark.url
+        }
+      };
+
+      // If there are notes, add a paragraph block before the bookmark
+      const children = [];
+      if (bookmark.notes && bookmark.notes.trim()) {
+        children.push({
+          type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              {
+                type: 'text',
+                text: {
+                  content: bookmark.notes.trim()
+                }
+              }
+            ]
+          }
+        });
+      }
+      
+      children.push(bookmarkBlock);
+
+      const response = await fetch(`https://api.notion.com/v1/blocks/${this.pageId}/children`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           'Notion-Version': '2022-06-28'
         },
         body: JSON.stringify({
-          parent: {
-            database_id: this.databaseId
-          },
-          properties: {
-            Name: {
-              title: [
-                {
-                  text: {
-                    content: bookmark.title || bookmark.url
-                  }
-                }
-              ]
-            },
-            URL: {
-              url: bookmark.url
-            },
-            Notes: {
-              rich_text: [
-                {
-                  text: {
-                    content: bookmark.notes || ''
-                  }
-                }
-              ]
-            }
-          }
+          children: children
         })
       });
 
@@ -75,7 +78,7 @@ export class NotionService {
       const data = await response.json();
       return {
         success: true,
-        pageId: data.id
+        pageId: this.pageId
       };
     } catch (error) {
       return {
@@ -87,7 +90,7 @@ export class NotionService {
 
   async testConnection(): Promise<NotionResponse> {
     try {
-      const response = await fetch(`https://api.notion.com/v1/databases/${this.databaseId}`, {
+      const response = await fetch(`https://api.notion.com/v1/pages/${this.pageId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
