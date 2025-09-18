@@ -51,7 +51,9 @@ export class NotionService {
         }
       });
       
-      // 2. Add @now timestamp using Notion's built-in @now format
+      // 2. Add @now datetime stamp
+      const now = new Date();
+      const dateTimeStamp = `@${now.toISOString()}`;
       children.push({
         type: 'paragraph',
         paragraph: {
@@ -59,7 +61,7 @@ export class NotionService {
             {
               type: 'text',
               text: {
-                content: '@now'
+                content: dateTimeStamp
               }
             }
           ]
