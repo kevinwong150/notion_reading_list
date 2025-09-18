@@ -14,23 +14,23 @@ A browser extension that captures the current tab's URL and displays it in a pop
 ### Prerequisites
 
 - Node.js (v14 or higher)
-- npm
+- yarn
 
 ### Setup
 
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   yarn install
    ```
 
 3. Build the extension:
    ```bash
    # For Chrome (Manifest v3)
-   npm run build:chrome
+   yarn build:chrome
    
    # For Firefox (Manifest v2)
-   npm run build:firefox
+   yarn build:firefox
    ```
 
 ### Installing the Extension
@@ -76,8 +76,8 @@ public/
 
 ## Build Scripts
 
-- `npm run build` - Build for production (Chrome by default)
-- `npm run build:chrome` - Build specifically for Chrome
-- `npm run build:firefox` - Build specifically for Firefox
-- `npm run dev` - Build for development
-- `npm run watch` - Watch for changes and rebuild
+- `yarn build` - Build for production (Chrome by default)
+- `yarn build:chrome` - Build specifically for Chrome
+- `yarn build:firefox` - Build specifically for Firefox
+- `yarn dev` - Build for development
+- `yarn watch` - Watch for changes and rebuild
