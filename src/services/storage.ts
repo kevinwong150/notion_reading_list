@@ -1,7 +1,7 @@
 // Storage service for managing extension settings
 export interface StorageSettings {
   notionApiKey?: string;
-  notionDatabaseId?: string;
+  notionPageId?: string;
 }
 
 export class StorageService {
