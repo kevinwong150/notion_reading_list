@@ -5,7 +5,11 @@
   "description": "A browser extension to capture URLs and manage reading list",
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.notion.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

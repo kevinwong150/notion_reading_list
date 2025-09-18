@@ -5,8 +5,13 @@ A browser extension that captures the current tab's URL and displays it in a pop
 ## Features
 
 - ✅ Shows a popup when extension button is clicked
-- ✅ Displays placeholder text
 - ✅ Captures and shows the current active tab's URL
+- ✅ **NEW:** Notion API integration for saving bookmarks
+- ✅ **NEW:** User configuration interface for Notion API key and Database ID
+- ✅ **NEW:** Save current webpage as bookmark to Notion database
+- ✅ **NEW:** Customizable title and notes for each bookmark
+- ✅ **NEW:** Connection testing and error handling
+- ✅ **NEW:** Local storage for user settings
 - ✅ Compatible with both Chrome and Firefox
 - ✅ Docker support for development and production
 
@@ -146,9 +151,19 @@ The Docker setup provides two main environments:
 ### Using the Extension
 
 1. Click the extension icon in your browser toolbar
-2. A popup will appear showing:
-   - "Placeholder" text
-   - The current tab's URL
+2. **First time setup:**
+   - The extension will show a configuration form
+   - Enter your Notion API Key (integration token)
+   - Enter your Notion Database ID
+   - Click "Save & Test" to verify the connection
+   - See [NOTION_SETUP.md](./NOTION_SETUP.md) for detailed setup instructions
+3. **Saving bookmarks:**
+   - Navigate to any webpage you want to bookmark
+   - Click the extension icon
+   - Optionally customize the title and add notes
+   - Click "Save to Notion" to add the bookmark to your database
+4. **Managing settings:**
+   - Click the "⚙️ Settings" button to update your Notion configuration
 
 ## Project Structure
 
