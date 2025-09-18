@@ -1,0 +1,60 @@
+.popup-container {
+  padding: 0;
+  margin: 0;
+  min-height: 180px;
+}
+
+.popup-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #2d3748;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.placeholder-text {
+  font-size: 16px;
+  color: #4a5568;
+  text-align: center;
+  margin: 0;
+  padding: 12px;
+  background-color: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.loading {
+  font-size: 14px;
+  color: #718096;
+  text-align: center;
+  margin: 0;
+}
+
+.url-section {
+  margin-top: 8px;
+}
+
+.url-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #2d3748;
+}
+
+.current-url {
+  font-size: 12px;
+  color: #4a5568;
+  word-break: break-all;
+  background-color: #f7fafc;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  margin: 0;
+  line-height: 1.4;
+}
