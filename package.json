@@ -9,7 +9,12 @@
     "build:firefox": "webpack --mode=production && cp public/manifest-firefox.json dist/manifest.json && echo 'Firefox addon built in dist/'",
     "dev": "webpack --mode=development",
     "watch": "webpack --mode=development --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docker:dev": "docker compose up dev",
+    "docker:build": "docker compose up build",
+    "docker:prod": "docker compose up prod",
+    "docker:build-image": "docker build -t notion-reading-list .",
+    "docker:run": "docker run -p 8080:80 notion-reading-list"
   },
   "keywords": [
     "browser-extension",
