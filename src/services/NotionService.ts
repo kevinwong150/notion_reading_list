@@ -35,6 +35,12 @@ export class NotionService {
     bookmarkData: BookmarkData
   ): Promise<boolean> {
     try {
+      // Validate URL format
+      if (!this.isValidUrl(bookmarkData.url)) {
+        console.error('Invalid URL format:', bookmarkData.url);
+        return false;
+      }
+
       const bookmarkBlock = {
         object: 'block',
         type: 'bookmark',
@@ -72,6 +78,18 @@ export class NotionService {
       return true;
     } catch (error) {
       console.error('Error appending bookmark:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Validate URL format
+   */
+  private isValidUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    } catch {
       return false;
     }
   }

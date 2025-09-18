@@ -118,11 +118,23 @@ const Popup: React.FC = () => {
       return;
     }
 
+    // Check if URL is a valid web URL
+    try {
+      const url = new URL(currentUrl);
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        showMessage('Can only bookmark web pages (http/https URLs)', 'error');
+        return;
+      }
+    } catch {
+      showMessage('Invalid URL format', 'error');
+      return;
+    }
+
     setSaving(true);
 
     const bookmarkData: BookmarkData = {
       url: currentUrl,
-      title: currentTitle !== 'No title found' ? currentTitle : undefined,
+      title: currentTitle !== 'No title found' && currentTitle !== 'Extension Context Required' ? currentTitle : undefined,
     };
 
     const success = await notionService.appendBookmarkToPage(
@@ -132,7 +144,7 @@ const Popup: React.FC = () => {
     );
 
     if (success) {
-      showMessage('Bookmark added to Notion page!', 'success');
+      showMessage(`✅ "${currentTitle}" bookmarked successfully!`, 'success');
     } else {
       showMessage('Failed to add bookmark. Please check your settings.', 'error');
     }
