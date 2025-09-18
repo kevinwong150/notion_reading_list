@@ -1,0 +1,20 @@
+# Development Dockerfile for Notion Reading List Browser Extension
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Expose port for development server (if needed)
+EXPOSE 3000
+
+# Default command for development
+CMD ["npm", "run", "watch"]
