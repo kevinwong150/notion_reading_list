@@ -27,17 +27,52 @@ export class NotionService {
 
   async saveBookmark(bookmark: BookmarkData): Promise<NotionResponse> {
     try {
-      // Create a bookmark block to append to the page
-      const bookmarkBlock = {
-        type: 'bookmark',
-        bookmark: {
-          url: bookmark.url
-        }
-      };
-
-      // If there are notes, add a paragraph block before the bookmark
+      // Create blocks according to the specified format:
+      // 1. Empty line separator
+      // 2. @now datetime stamp
+      // 3. Notes (if any) or Title (if no notes)
+      // 4. Bookmark URL
+      
       const children = [];
-      if (bookmark.notes && bookmark.notes.trim()) {
+      
+      // 1. Add empty line separator
+      children.push({
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [
+            {
+              type: 'text',
+              text: {
+                content: ''
+              }
+            }
+          ]
+        }
+      });
+      
+      // 2. Add @now datetime stamp
+      const now = new Date();
+      const dateTimeStamp = `@${now.toISOString()}`;
+      children.push({
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [
+            {
+              type: 'text',
+              text: {
+                content: dateTimeStamp
+              }
+            }
+          ]
+        }
+      });
+      
+      // 3. Add Notes (if any) or Title (if no notes)
+      const contentText = (bookmark.notes && bookmark.notes.trim()) 
+        ? bookmark.notes.trim() 
+        : (bookmark.title || '');
+      
+      if (contentText) {
         children.push({
           type: 'paragraph',
           paragraph: {
@@ -45,7 +80,7 @@ export class NotionService {
               {
                 type: 'text',
                 text: {
-                  content: bookmark.notes.trim()
+                  content: contentText
                 }
               }
             ]
@@ -53,6 +88,13 @@ export class NotionService {
         });
       }
       
+      // 4. Add the bookmark URL
+      const bookmarkBlock = {
+        type: 'bookmark',
+        bookmark: {
+          url: bookmark.url
+        }
+      };
       children.push(bookmarkBlock);
 
       const response = await fetch(`https://api.notion.com/v1/blocks/${this.pageId}/children`, {
