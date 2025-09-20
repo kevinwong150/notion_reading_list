@@ -29,9 +29,10 @@ export class NotionService {
     try {
       // Create blocks according to the specified format:
       // 1. Empty line separator
-      // 2. @now datetime stamp
-      // 3. Notes (if any) or Title (if no notes)
-      // 4. Bookmark URL
+      // 2. Timestamp with @now format - notion built-in @now tag
+      // 3. Title - Displays page title
+      // 4. Bookmark URL - The actual bookmark block for the saved URL
+      // 5. Notes - if notes provided, display notes, otherwise ignore this line
       
       const children = [];
       
@@ -50,9 +51,7 @@ export class NotionService {
         }
       });
       
-      // 2. Add @now datetime stamp
-      const now = new Date();
-      const dateTimeStamp = `@${now.toISOString()}`;
+      // 2. Add @now timestamp using Notion's built-in @now format
       children.push({
         type: 'paragraph',
         paragraph: {
@@ -60,19 +59,15 @@ export class NotionService {
             {
               type: 'text',
               text: {
-                content: dateTimeStamp
+                content: '@now'
               }
             }
           ]
         }
       });
       
-      // 3. Add Notes (if any) or Title (if no notes)
-      const contentText = (bookmark.notes && bookmark.notes.trim()) 
-        ? bookmark.notes.trim() 
-        : (bookmark.title || '');
-      
-      if (contentText) {
+      // 3. Add Title - always display if available
+      if (bookmark.title && bookmark.title.trim()) {
         children.push({
           type: 'paragraph',
           paragraph: {
@@ -80,7 +75,7 @@ export class NotionService {
               {
                 type: 'text',
                 text: {
-                  content: contentText
+                  content: bookmark.title.trim()
                 }
               }
             ]
@@ -96,6 +91,23 @@ export class NotionService {
         }
       };
       children.push(bookmarkBlock);
+      
+      // 5. Add Notes - only if notes are provided
+      if (bookmark.notes && bookmark.notes.trim()) {
+        children.push({
+          type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              {
+                type: 'text',
+                text: {
+                  content: bookmark.notes.trim()
+                }
+              }
+            ]
+          }
+        });
+      }
 
       const response = await fetch(`https://api.notion.com/v1/blocks/${this.pageId}/children`, {
         method: 'PATCH',
