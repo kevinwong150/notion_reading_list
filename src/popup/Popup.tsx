@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './popup.css';
 import { NotionService, NotionConfig, BookmarkData } from '../services/notion';
-import { StorageService, StorageSettings } from '../services/storage';
+import { StorageService, StorageSettings, TempSettings } from '../services/storage';
 
 const Popup: React.FC = () => {
   const [currentUrl, setCurrentUrl] = useState<string>('');
@@ -14,19 +14,25 @@ const Popup: React.FC = () => {
   const [bookmarkNotes, setBookmarkNotes] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  // Refs for debouncing auto-save
+  const apiKeyTimeoutRef = useRef<NodeJS.Timeout>();
+  const pageIdTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     // Load settings and current URL
     const initializePopup = async () => {
       try {
-        const [savedSettings] = await Promise.all([
+        const [savedSettings, tempSettings] = await Promise.all([
           StorageService.getSettings(),
+          StorageService.getTempSettings(),
           getCurrentTabUrl()
         ]);
         
         setSettings(savedSettings);
-        setTempApiKey(savedSettings.notionApiKey || '');
-        setTempPageId(savedSettings.notionPageId || '');
+        // Prioritize temp settings over saved settings for input fields
+        setTempApiKey(tempSettings.tempApiKey || savedSettings.notionApiKey || '');
+        setTempPageId(tempSettings.tempPageId || savedSettings.notionPageId || '');
         
         // Show config if settings are missing
         if (!savedSettings.notionApiKey || !savedSettings.notionPageId) {
@@ -40,6 +46,16 @@ const Popup: React.FC = () => {
     };
 
     initializePopup();
+    
+    // Cleanup timeouts on unmount
+    return () => {
+      if (apiKeyTimeoutRef.current) {
+        clearTimeout(apiKeyTimeoutRef.current);
+      }
+      if (pageIdTimeoutRef.current) {
+        clearTimeout(pageIdTimeoutRef.current);
+      }
+    };
   }, []);
 
   const getCurrentTabUrl = async () => {
@@ -75,6 +91,83 @@ const Popup: React.FC = () => {
     setTimeout(() => setMessage(null), 4000);
   };
 
+  // Auto-save temp settings with debouncing
+  const autoSaveTempSettings = async (key: 'tempApiKey' | 'tempPageId', value: string) => {
+    try {
+      const currentTempSettings = await StorageService.getTempSettings();
+      const updatedTempSettings = {
+        ...currentTempSettings,
+        [key]: value.trim()
+      };
+      await StorageService.saveTempSettings(updatedTempSettings);
+    } catch (error) {
+      console.error('Error auto-saving temp settings:', error);
+    }
+  };
+
+  // Handle API key changes with auto-save
+  const handleApiKeyChange = (value: string) => {
+    setTempApiKey(value);
+    
+    // Clear existing timeout
+    if (apiKeyTimeoutRef.current) {
+      clearTimeout(apiKeyTimeoutRef.current);
+    }
+    
+    // Debounce auto-save by 500ms
+    apiKeyTimeoutRef.current = setTimeout(() => {
+      autoSaveTempSettings('tempApiKey', value);
+    }, 500);
+  };
+
+  // Handle page ID changes with auto-save
+  const handlePageIdChange = (value: string) => {
+    setTempPageId(value);
+    
+    // Clear existing timeout
+    if (pageIdTimeoutRef.current) {
+      clearTimeout(pageIdTimeoutRef.current);
+    }
+    
+    // Debounce auto-save by 500ms
+    pageIdTimeoutRef.current = setTimeout(() => {
+      autoSaveTempSettings('tempPageId', value);
+    }, 500);
+  };
+
+  // Handle paste events for immediate save
+  const handleApiKeyPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    // Get pasted content
+    const pastedText = e.clipboardData.getData('text');
+    const newValue = e.currentTarget.value + pastedText;
+    
+    // Clear timeout if exists
+    if (apiKeyTimeoutRef.current) {
+      clearTimeout(apiKeyTimeoutRef.current);
+    }
+    
+    // Save immediately on paste
+    setTimeout(() => {
+      autoSaveTempSettings('tempApiKey', newValue);
+    }, 100);
+  };
+
+  const handlePageIdPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    // Get pasted content
+    const pastedText = e.clipboardData.getData('text');
+    const newValue = e.currentTarget.value + pastedText;
+    
+    // Clear timeout if exists
+    if (pageIdTimeoutRef.current) {
+      clearTimeout(pageIdTimeoutRef.current);
+    }
+    
+    // Save immediately on paste
+    setTimeout(() => {
+      autoSaveTempSettings('tempPageId', newValue);
+    }, 100);
+  };
+
   const handleSaveConfig = async () => {
     if (!tempApiKey.trim() || !tempPageId.trim()) {
       showMessage('error', 'Please fill in both API key and Page ID');
@@ -102,6 +195,8 @@ const Popup: React.FC = () => {
       }
 
       await StorageService.saveSettings(newSettings);
+      // Clear temp settings since they're now saved permanently
+      await StorageService.clearTempSettings();
       setSettings(newSettings);
       setShowConfig(false);
       showMessage('success', 'Configuration saved successfully!');
@@ -179,7 +274,8 @@ const Popup: React.FC = () => {
                     id="apiKey"
                     type="password"
                     value={tempApiKey}
-                    onChange={(e) => setTempApiKey(e.target.value)}
+                    onChange={(e) => handleApiKeyChange(e.target.value)}
+                    onPaste={handleApiKeyPaste}
                     placeholder="secret_xxxxx..."
                     className="form-input"
                   />
@@ -190,7 +286,8 @@ const Popup: React.FC = () => {
                     id="pageId"
                     type="text"
                     value={tempPageId}
-                    onChange={(e) => setTempPageId(e.target.value)}
+                    onChange={(e) => handlePageIdChange(e.target.value)}
+                    onPaste={handlePageIdPaste}
                     placeholder="32-character page ID"
                     className="form-input"
                   />
