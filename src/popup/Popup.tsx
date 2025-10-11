@@ -11,9 +11,11 @@ const Popup: React.FC = () => {
   const [tempApiKey, setTempApiKey] = useState<string>('');
   const [tempPageId, setTempPageId] = useState<string>('');
   const [bookmarkTitle, setBookmarkTitle] = useState<string>('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [bookmarkNotes, setBookmarkNotes] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [tempTags, setTempTags] = useState<string>('');
   
   // Refs for debouncing auto-save
   const apiKeyTimeoutRef = useRef<NodeJS.Timeout>();
@@ -177,7 +179,8 @@ const Popup: React.FC = () => {
     try {
       const newSettings: StorageSettings = {
         notionApiKey: tempApiKey.trim(),
-        notionPageId: tempPageId.trim()
+        notionPageId: tempPageId.trim(),
+        availableTags: settings.availableTags || []
       };
 
       // Test the connection before saving
@@ -207,6 +210,57 @@ const Popup: React.FC = () => {
     }
   };
 
+  const handleAddTag = async () => {
+    const newTag = tempTags.trim();
+    if (!newTag) return;
+
+    const currentTags = settings.availableTags || [];
+    if (currentTags.includes(newTag)) {
+      showMessage('error', 'Tag already exists');
+      return;
+    }
+
+    const updatedSettings = {
+      ...settings,
+      availableTags: [...currentTags, newTag]
+    };
+
+    try {
+      await StorageService.saveSettings(updatedSettings);
+      setSettings(updatedSettings);
+      setTempTags('');
+      showMessage('success', 'Tag added successfully!');
+    } catch (error) {
+      showMessage('error', 'Failed to add tag');
+    }
+  };
+
+  const handleRemoveTag = async (tagToRemove: string) => {
+    const currentTags = settings.availableTags || [];
+    const updatedSettings = {
+      ...settings,
+      availableTags: currentTags.filter(tag => tag !== tagToRemove)
+    };
+
+    try {
+      await StorageService.saveSettings(updatedSettings);
+      setSettings(updatedSettings);
+      // Also remove from selected tags if it was selected
+      setSelectedTags(selectedTags.filter(tag => tag !== tagToRemove));
+      showMessage('success', 'Tag removed successfully!');
+    } catch (error) {
+      showMessage('error', 'Failed to remove tag');
+    }
+  };
+
+  const handleToggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
   const handleSaveBookmark = async () => {
     if (!settings.notionApiKey || !settings.notionPageId) {
       showMessage('error', 'Please configure Notion settings first');
@@ -230,6 +284,7 @@ const Popup: React.FC = () => {
       const bookmarkData: BookmarkData = {
         url: currentUrl,
         title: bookmarkTitle.trim() || undefined,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
         notes: bookmarkNotes.trim() || undefined
       };
 
@@ -238,6 +293,7 @@ const Popup: React.FC = () => {
       if (result.success) {
         showMessage('success', 'Bookmark saved to Notion!');
         setBookmarkNotes(''); // Clear notes after successful save
+        setSelectedTags([]); // Clear tags after successful save
       } else {
         showMessage('error', `Failed to save: ${result.error}`);
       }
@@ -292,6 +348,48 @@ const Popup: React.FC = () => {
                     className="form-input"
                   />
                 </div>
+                <div className="form-group">
+                  <label htmlFor="tags">Available Tags:</label>
+                  <div className="tags-input-container">
+                    <input
+                      id="tags"
+                      type="text"
+                      value={tempTags}
+                      onChange={(e) => setTempTags(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      placeholder="Add a new tag..."
+                      className="form-input"
+                    />
+                    <button 
+                      onClick={handleAddTag}
+                      type="button"
+                      className="btn btn-secondary btn-add-tag"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {settings.availableTags && settings.availableTags.length > 0 && (
+                    <div className="tags-list">
+                      {settings.availableTags.map(tag => (
+                        <div key={tag} className="tag-item">
+                          <span className="tag-name">{tag}</span>
+                          <button 
+                            onClick={() => handleRemoveTag(tag)}
+                            className="btn-remove-tag"
+                            type="button"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="button-group">
                   <button 
                     onClick={handleSaveConfig}
@@ -330,6 +428,23 @@ const Popup: React.FC = () => {
                         className="form-input"
                       />
                     </div>
+                    {settings.availableTags && settings.availableTags.length > 0 && (
+                      <div className="form-group">
+                        <label htmlFor="tags">Tags (optional):</label>
+                        <div className="tags-select">
+                          {settings.availableTags.map(tag => (
+                            <label key={tag} className="tag-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={selectedTags.includes(tag)}
+                                onChange={() => handleToggleTag(tag)}
+                              />
+                              <span className="tag-label">{tag}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <div className="form-group">
                       <label htmlFor="notes">Notes (optional):</label>
                       <textarea

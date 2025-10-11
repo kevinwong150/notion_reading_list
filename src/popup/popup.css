@@ -206,3 +206,106 @@
   padding-top: 12px;
   border-top: 1px solid #e2e8f0;
 }
+
+/* Tags styles */
+.tags-input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tags-input-container .form-input {
+  flex: 1;
+}
+
+.btn-add-tag {
+  padding: 8px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tags-list {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #2d3748;
+}
+
+.tag-name {
+  font-weight: 500;
+}
+
+.btn-remove-tag {
+  background: none;
+  border: none;
+  color: #718096;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-remove-tag:hover {
+  background-color: #cbd5e0;
+  color: #2d3748;
+}
+
+.tags-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background-color: #f7fafc;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.tag-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  border: 1px solid #cbd5e0;
+  font-size: 13px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.tag-checkbox:hover {
+  background-color: #e2e8f0;
+  border-color: #a0aec0;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .tag-label {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.tag-label {
+  color: #4a5568;
+}

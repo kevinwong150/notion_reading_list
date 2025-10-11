@@ -7,6 +7,7 @@ export interface NotionConfig {
 export interface BookmarkData {
   url: string;
   title?: string;
+  tags?: string[];
   notes?: string;
 }
 
@@ -31,8 +32,9 @@ export class NotionService {
       // 1. Empty line separator
       // 2. Timestamp with @now format - notion built-in @now tag
       // 3. Title - Displays page title
-      // 4. Bookmark URL - The actual bookmark block for the saved URL
-      // 5. Notes - if notes provided, display notes, otherwise ignore this line
+      // 4. Tags - if tags provided, display them
+      // 5. Bookmark URL - The actual bookmark block for the saved URL
+      // 6. Notes - if notes provided, display notes, otherwise ignore this line
       
       const children = [];
       
@@ -85,7 +87,25 @@ export class NotionService {
         });
       }
       
-      // 4. Add the bookmark URL
+      // 4. Add Tags - only if tags are provided
+      if (bookmark.tags && bookmark.tags.length > 0) {
+        const tagsText = bookmark.tags.join(', ');
+        children.push({
+          type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              {
+                type: 'text',
+                text: {
+                  content: tagsText
+                }
+              }
+            ]
+          }
+        });
+      }
+      
+      // 5. Add the bookmark URL
       const bookmarkBlock = {
         type: 'bookmark',
         bookmark: {
@@ -94,7 +114,7 @@ export class NotionService {
       };
       children.push(bookmarkBlock);
       
-      // 5. Add Notes - only if notes are provided
+      // 6. Add Notes - only if notes are provided
       if (bookmark.notes && bookmark.notes.trim()) {
         children.push({
           type: 'paragraph',

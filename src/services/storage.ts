@@ -2,6 +2,7 @@
 export interface StorageSettings {
   notionApiKey?: string;
   notionPageId?: string;
+  availableTags?: string[];
 }
 
 export interface TempSettings {
