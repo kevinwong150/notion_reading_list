@@ -95,7 +95,8 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
+  align-items: center;
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 4px;
@@ -270,6 +271,7 @@
 
 .tags-select {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   padding: 8px;
