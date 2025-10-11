@@ -89,7 +89,7 @@ export class NotionService {
       
       // 4. Add Tags - only if tags are provided
       if (bookmark.tags && bookmark.tags.length > 0) {
-        const tagsText = bookmark.tags.join(', ');
+        const tagsText = bookmark.tags.map(tag => `#${tag}`).join(' ');
         children.push({
           type: 'paragraph',
           paragraph: {
